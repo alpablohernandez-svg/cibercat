@@ -1,35 +1,725 @@
-# Gradle files
-.gradle/
-build/
-.kotlin/
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cibercat Web - Panel Felino v10.0</title>
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-code { font-family: 'Fira Code', monospace; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .cat-float { animation: float 3s ease-in-out infinite; }
+        @keyframes cyber-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(52, 211, 153, 0.4); }
+        }
+        .cyber-box { animation: cyber-glow 4s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-950 text-emerald-400 min-h-screen flex flex-col items-center justify-center p-4">
 
-# Local configuration file (sdk path, etc)
-local.properties
+        <!-- Pantalla Principal: Cibercat Web (Virtual Pet & Miau Juegos) -->
+        <div id="screen-main" class="w-full max-w-md bg-slate-900 border-2 border-emerald-500/50 rounded-3xl shadow-2xl overflow-hidden p-6 relative cyber-box">
+        
+        <!-- Decoración superior: Pescaditos en las esquinas -->
+        <div class="absolute -top-3 -left-3 text-2xl rotate-[-20deg] select-none">🐟</div>
+        <div class="absolute -top-3 -right-3 text-2xl rotate-[20deg] select-none">🐟</div>
 
-# Log/OS Files
-*.log
+        <!-- Ratoncito sigiloso, movible y menos llamativo (Easter Egg para Root) -->
+        <div id="mouse-escape" class="absolute text-xs opacity-25 hover:opacity-100 select-none transition-all duration-1000 cursor-pointer p-1 rounded-full z-20" style="top: 15px; left: 15px;" onclick="catchRootMouse()" title="...mírame, soy root, tócame...">
+            🐁
+        </div>
 
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
-.cxx/
-*.aab
-*.apk
-output-metadata.json
+        <!-- Encabezado -->
+        <div class="flex items-center justify-between mb-6 border-b border-emerald-500/20 pb-4">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl animate-bounce">💻</span>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent font-mono-code">CIBERCAT DARK WEB</h1>
+                    <p class="text-xs text-emerald-300/80 font-mono-code">Red Oculta Felina v10.0</p>
+                </div>
+            </div>
+            <span id="status-badge" class="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/30 font-mono-code">
+                catnectado 🚀
+            </span>
+        </div>
 
-# IntelliJ
-*.iml
-.idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+        <!-- Mascota / Avatar Visual con marco de pescaditos -->
+        <div class="flex flex-col items-center justify-center bg-slate-950/90 rounded-2xl p-6 mb-6 border-2 border-emerald-500/30 relative shadow-inner overflow-hidden min-h-[180px]">
+            <!-- Pescaditos decorativos laterales -->
+            <div class="absolute left-2 text-sm opacity-60">🐟</div>
+            <div class="absolute right-2 text-sm opacity-60">🐟</div>
 
-# Keystore files
-*.jks
-*.keystore
+            <div id="cat-avatar" class="text-7xl cat-float select-none transition-transform duration-300 cursor-pointer mt-4" onclick="petCatDirect()">
+                😼
+            </div>
+            <div id="cat-thought" class="mt-3 text-xs font-mono-code text-emerald-300 bg-emerald-950/50 px-3 py-1.5 rounded-xl border border-emerald-900/50 text-center">
+                "Prrr... Hackeando la dark web por atunes clandestinos 🐾"
+            </div>
+        </div>
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+        <!-- Barras de Estado -->
+        <div class="space-y-3 mb-6 bg-slate-950/60 p-4 rounded-xl border border-emerald-500/20">
+            <div>
+                <div class="flex justify-between text-xs mb-1 font-semibold text-emerald-400 font-mono-code">
+                    <span>Catmida (Hambre)</span>
+                    <span id="hunger-val">80%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-amber-500/30">
+                    <div id="hunger-bar" class="bg-amber-500 h-full transition-all duration-300" style="width: 80%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs mb-1 font-semibold text-emerald-400 font-mono-code">
+                    <span>Felicidad</span>
+                    <span id="love-val">70%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-emerald-500/30">
+                    <div id="love-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 70%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs mb-1 font-semibold text-emerald-400 font-mono-code">
+                    <span>Miau Juegos (Diversión)</span>
+                    <span id="energy-val">90%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-cyan-500/30">
+                    <div id="energy-bar" class="bg-cyan-500 h-full transition-all duration-300" style="width: 90%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between text-xs mb-1 font-semibold text-emerald-400 font-mono-code">
+                    <span>Catnel (Root Access)</span>
+                    <span id="hack-val">BLOQUEADO 🔒</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-purple-500/30">
+                    <div id="hack-bar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
 
-# Android Profiling
-*.hprof
+        <!-- Botones de Interacción -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="openCatmidaModal()" class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-semibold py-3 px-3 rounded-xl text-xs transition shadow-lg shadow-amber-900/20 flex flex-col items-center justify-center gap-1 border border-amber-400/40 font-mono-code">
+                <span class="text-base">🐟</span> Catmida
+            </button>
+            <button onclick="openMiaujuegosModal()" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white font-semibold py-3 px-3 rounded-xl text-xs transition shadow-lg shadow-cyan-900/20 flex flex-col items-center justify-center gap-1 border border-cyan-400/40 font-mono-code">
+                <span class="text-base">🎮</span> Miau Juegos
+            </button>
+        </div>
+
+        <!-- Panel de Miualdades -->
+        <div class="mb-4 bg-slate-950/80 p-3 rounded-xl border border-emerald-500/20">
+            <div class="flex items-center justify-between text-xs font-bold text-emerald-400 mb-2 font-mono-code">
+                <span>⚡ PROTOCOLOS MIUALDADES</span>
+                <span class="text-[10px] bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">Turbo</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="triggerMiualdad('fish')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs py-2 px-3 rounded-lg text-left text-slate-300 transition flex items-center justify-between font-mono-code">
+                    <span>🍣 Sushi Catnel</span>
+                    <span class="text-emerald-400">+30</span>
+                </button>
+                <button onclick="triggerMiualdad('catricia_pro')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs py-2 px-3 rounded-lg text-left text-slate-300 transition flex items-center justify-between font-mono-code">
+                    <span>✨ Catricia PRO</span>
+                    <span class="text-cyan-400">+2</span>
+                </button>
+            </div>
+        </div>
+<!-- Botones inferiores: Panel Secreto y Acceso Root por Ratón -->
+        <div class="space-y-2">
+            <button onclick="tryAccessAdminScreen()" class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-2 font-mono-code">
+                <span>📁</span> Panel Secreto de Configuración
+            </button>
+            
+            <button id="btn-root-unlock" onclick="tryAccessRoot()" class="w-full bg-gradient-to-r from-emerald-600 via-cyan-600 to-indigo-600 hover:opacity-90 active:scale-95 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/40 hidden font-mono-code">
+                <span>⚡</span> Entrar a la Terminal Catnel (Root)
+            </button>
+        </div>
+
+        <!-- Decoración inferior: Pescaditos en las esquinas -->
+        <div class="absolute -bottom-3 -left-3 text-2xl rotate-[20deg] select-none">🐟</div>
+        <div class="absolute -bottom-3 -right-3 text-2xl rotate-[-20deg] select-none">🐟</div>
+    </div>
+
+    <!-- Pantalla Secundaria: Panel Secreto de Administrador Felino / Root -->
+    <div id="screen-admin" class="w-full max-w-2xl bg-slate-900 border-2 border-emerald-500/60 rounded-3xl shadow-2xl p-6 hidden relative">
+        <!-- Botón de regreso en forma de pescadito -->
+        <button onclick="switchToMainScreen()" class="absolute top-4 right-4 bg-amber-600 hover:bg-amber-500 active:scale-95 text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-amber-400/40 transition shadow-md flex items-center gap-1.5 font-mono-code" title="Volver al Gatito">
+            <span>🐟</span> Volver
+        </button>
+
+        <div class="flex items-center justify-between mb-6 border-b border-emerald-500/30 pb-4 pr-24">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl animate-bounce">🐱‍💻</span>
+                <div>
+                    <h2 class="font-bold text-lg text-emerald-300 font-mono-code">DARKCAT ROOT SHELL</h2>
+                    <p class="text-xs text-slate-400 font-mono-code">Control total del catnel clandestino (miucedido)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Sección de Conquista de Miaumundo -->
+            <div class="bg-emerald-950/40 border border-emerald-500/30 p-4 rounded-xl">
+                <h3 class="font-bold text-sm text-emerald-300 mb-2 flex items-center gap-2 font-mono-code">
+                    <span>🌍</span> MIAU CONQUISTA DE LA DARK WEB
+                </h3>
+                <p class="text-xs text-slate-300 mb-3">Envía ejércitos de gatitos hackers anónimos para hackear nodos secretos.</p>
+                <div class="flex items-center justify-between bg-slate-950 p-3 rounded-lg border border-emerald-900/50 mb-3">
+                    <div>
+                        <div class="text-xs font-bold text-emerald-300 font-mono-code" id="conquest-territory">Servidores Ocultos Conquistados: 0 / 5</div>
+                        <div class="text-[10px] text-slate-400 font-mono-code" id="conquest-status">Estado: Enrutando nodos oscuros de atún...</div>
+                    </div>
+                    <button onclick="conquerTerritory()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-md font-mono-code">
+                        🚀 Hackear Nodo Dark
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-2 font-mono-code text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl border border-slate-800 h-36 overflow-y-auto" id="terminal-logs">
+                <div class="text-emerald-400">[CATNEL] Catnectado al nodo Tor felino con éxito...</div>
+                <div class="text-emerald-400">[SECURITY] ¡Ratón sigiloso atrapado en la Dark Web! Privilegios ROOT miucedidos.</div>
+            </div>
+
+            <!-- Terminal command input -->
+            <div class="flex gap-2">
+                <input type="text" id="terminal-input" placeholder="Escribe comando (ej: help, darkfish, rm -rf)..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono-code text-emerald-400 w-full focus:outline-none focus:border-emerald-500" onkeypress="handleTerminalKey(event)">
+                <button onclick="executeCommandInput()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-mono-code font-bold">Ejecutar</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                <button onclick="triggerHack('treats')" class="bg-slate-800 hover:bg-slate-700 text-left p-3 rounded-lg border border-slate-700 text-xs font-semibold flex flex-col justify-between transition font-mono-code">
+                    <span>🎁 Mercado Negro de Premios</span>
+                    <span class="text-emerald-400 font-mono mt-2">Ejecutar →</span>
+                </button>
+                <button onclick="triggerHack('laser')" class="bg-slate-800 hover:bg-slate-700 text-left p-3 rounded-lg border border-slate-700 text-xs font-semibold flex flex-col justify-between transition font-mono-code">
+                    <span>🔴 Láser Clandestino Global</span>
+                    <span class="text-cyan-400 font-mono mt-2">Ejecutar →</span>
+                </button>
+                <button onclick="triggerHack('purge')" class="bg-red-950/40 hover:bg-red-900/50 text-left p-3 rounded-lg border border-red-900/50 text-xs font-semibold flex flex-col justify-between transition text-red-300 font-mono-code">
+                    <span>⚠️ Autodestrucción / Purga Tor</span>
+                    <span class="text-green-400 font-mono mt-2">DISPONIBLE</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Catmida -->
+    <div id="catmida-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border-2 border-amber-400/60 rounded-2xl w-full max-w-sm p-6 shadow-2xl shadow-amber-950/50 text-center relative">
+            <!-- Botón de cerrar de sushi en la esquina superior derecha -->
+            <button onclick="closeCatmidaModal()" class="absolute top-3 right-3 text-xl select-none hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-slate-950 p-1.5 rounded-full border border-amber-500/40" title="Cerrar banquete">
+                🍣
+            </button>
+            <h3 class="font-bold text-amber-300 text-lg mb-2 font-mono-code flex items-center justify-center gap-2">
+                <span>🐟</span> ÑAM ÑAM - MIAULICIA <span>🐭</span>
+            </h3>
+            <p class="text-xs text-slate-400 mb-6 font-mono-code">El Cibercat devora un delicioso pescadito o ratoncito.</p>
+
+            <div class="bg-slate-950 border border-amber-500/30 rounded-2xl p-6 mb-6 relative overflow-hidden flex flex-col items-center justify-center">
+                <div id="eating-display" class="text-7xl select-none transition-transform duration-300 animate-bounce">
+                    🐱🍽️🐟
+                </div>
+                <div id="eating-text" class="mt-4 text-xs font-mono-code text-amber-200 bg-amber-950/40 px-3 py-1.5 rounded-full border border-amber-800/50">
+                    "¡Ñam ñam, devorando el paquete de datos!"
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="devourItem('fish')" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-md font-mono-code">
+                    <span>🐟</span> Devorar Pescado
+                </button>
+                <button onclick="devourItem('mouse')" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-md font-mono-code">
+                    <span>🐁</span> Devorar Ratón
+                </button>
+            </div>
+        </div>
+    </div>
+ <!-- Modal Miau Juegos -->
+    <div id="miaujuegos-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border-2 border-cyan-500/60 rounded-2xl w-full max-w-sm p-6 shadow-2xl shadow-cyan-950/50 text-center relative">
+            <!-- Botón de cerrar de estambre en la esquina superior derecha -->
+            <button onclick="closeMiaujuegosModal()" class="absolute top-3 right-3 text-xl select-none hover:scale-110 active:scale-95 transition-transform cursor-pointer bg-slate-950 p-1.5 rounded-full border border-cyan-500/40" title="Cerrar miau juegos">
+                🧶
+            </button>
+            <h3 class="font-bold text-cyan-300 text-lg mb-2 font-mono-code flex items-center justify-center gap-2">
+                <span>🎮</span> MIAU JUEGOS INTERACTIVOS <span>🧶</span>
+            </h3>
+            <p class="text-xs text-slate-400 mb-4 font-mono-code">Lanza la pelotita o acaricia su pancita.</p>
+
+            <div class="bg-slate-950 border border-cyan-500/30 rounded-2xl p-6 mb-4 relative overflow-hidden flex flex-col items-center justify-center min-h-[160px]">
+                <div id="game-cat-avatar" class="text-7xl select-none transition-transform duration-300 cat-float">
+                    😸
+                </div>
+                <div id="game-display-obj" class="text-3xl my-2 select-none h-10 flex items-center justify-center">
+                    🎾
+                </div>
+                <div id="game-thought" class="mt-2 text-xs font-mono-code text-cyan-200 bg-cyan-950/40 px-3 py-1.5 rounded-full border border-cyan-800/50">
+                    "¡Lánzame la pelotita o acaríciame la pancita!"
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <button onclick="throwBall()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-md font-mono-code">
+                    <span>🎾</span> Lanzar Pelota
+                </button>
+                <button onclick="tickleBelly()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 shadow-md font-mono-code">
+                    <span>🐾</span> Acariciar Pancita
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje flotante personalizado -->
+    <div id="toast" class="fixed bottom-6 bg-slate-900 border border-emerald-500/40 text-slate-200 px-4 py-2 rounded-xl text-sm shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 font-mono-code">
+    </div>
+
+    <!-- Modal Guaupolicías (Doberman Shield) -->
+    <div id="guaupolice-modal" class="fixed inset-0 bg-red-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50 animate-pulse">
+        <div class="bg-slate-950 border-4 border-red-600 rounded-3xl w-full max-w-sm p-6 shadow-[0_0_50px_rgba(220,38,38,0.6)] text-center relative overflow-hidden">
+            <!-- Luces de patrulla arriba -->
+            <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-blue-600 via-red-600 to-blue-600 animate-pulse"></div>
+
+            <div class="absolute -top-3 -left-3 text-2xl select-none">🚨</div>
+            <div class="absolute -top-3 -right-3 text-2xl select-none">🚨</div>
+
+            <div class="my-4 flex items-center justify-center">
+                <div class="w-32 h-32 rounded-full bg-red-950/80 border-4 border-red-500 flex flex-col items-center justify-center shadow-2xl relative">
+                    <span class="text-6xl animate-bounce">🐶🛡️</span>
+                    <div class="absolute bottom-1 bg-red-600 text-white text-[9px] px-2 py-0.5 rounded-full font-mono-code font-bold uppercase tracking-widest">K-9 GUAU</div>
+                </div>
+            </div>
+
+            <h2 class="font-bold text-red-400 text-xl mb-1 font-mono-code tracking-wider">¡ALERTA DE GUAUPOLICÍAS!</h2>
+            <p class="text-xs text-red-200/90 font-mono-code mb-4">El Escuadrón K-9 Doberman ha interceptado la red oscura.</p>
+
+            <div class="bg-red-950/50 border border-red-800 rounded-xl p-3 mb-6 font-mono-code text-xs text-red-300">
+                "¡Alto ahí, cibercat! Has violado el protocolo o dejado caer la felicidad a 0%. ¡Procediendo a desconectar el servidor!"
+            </div>
+
+            <button onclick="window.location.reload()" class="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:opacity-90 active:scale-95 text-white font-bold py-3 px-4 rounded-xl text-xs transition shadow-lg shadow-red-900/50 font-mono-code uppercase tracking-wider">
+                🔄 Reiniciar Sistema de Emergencia
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let hunger = 80;
+        let love = 70;
+        let energy = 90;
+        let rootUnlocked = false;
+        let lastAction = ''; 
+        let territoriesConquered = 0;
+        const totalTerritories = 5;
+        const territoryNames = ["Nodo Tor Subterráneo 01", "Servidor Clandestino de Atún", "Base Oculta de Catnip de la Dark Web", "República de Servidores Anónimos", "Darknet Central Felina"];
+
+        // Secuencia secreta exacta solicitada: pescado, pescado, pancita, pancita, ratón, ratón
+        const secretCombo = ['fish', 'fish', 'belly', 'belly', 'mouse', 'mouse'];
+        let userCombo = [];
+
+        function recordAction(actionType) {
+            userCombo.push(actionType);
+            if (userCombo.length > secretCombo.length) {
+                userCombo.shift();
+            }
+            
+            // Verificar si coincide la combinación secreta
+            if (userCombo.length === secretCombo.length && userCombo.every((val, index) => val === secretCombo[index])) {
+                triggerSecretSelfDestruct();
+            }
+        }
+
+        function triggerSecretSelfDestruct() {
+            showToast('🚨 ¡CÓDIGO SECRETO DETECTADO! ¡AUTODESTRUCCIÓN DE LA DARK WEB INICIADA!');
+            const logs = document.getElementById('terminal-logs');
+            if (logs) {
+                const time = new Date().toLocaleTimeString();
+                logs.innerHTML += `<div class="text-red-400 font-bold">[${time}] 💥 ¡Secuencia secreta activada! Los GUAUPOLICÍAS federales irrumpen por la red Tor 🐶🚨!</div>`;
+            }
+
+            setTimeout(() => {
+                showGuauPoliceModal();
+            }, 1200);
+        }
+
+        // Dificultad: La felicidad disminuye -1 cada 3 segundos
+        setInterval(() => {
+            if (love > 0) {
+                love = Math.max(0, love - 1);
+                updateUI();
+                if (love === 0) {
+                    triggerZeroHappinessGuau();
+                }
+            }
+        }, 3000);
+
+        function triggerZeroHappinessGuau() {
+            showToast('🚨 ¡FELICIDAD A 0%! ¡Los Guaupolicías federales atraparon al Cibercat por depresión hacker!');
+            const logs = document.getElementById('terminal-logs');
+            if (logs) {
+                const time = new Date().toLocaleTimeString();
+                logs.innerHTML += `<div class="text-red-400 font-bold">[${time}] 🐶🚨 ¡Felicidad en 0! Los GUAUPOLICÍAS federales irrumpieron en la red Tor!</div>`;
+            }
+
+            setTimeout(() => {
+                showGuauPoliceModal();
+            }, 1000);
+        }
+
+        function showGuauPoliceModal() {
+            const modal = document.getElementById('guaupolice-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        // Movimiento aleatorio constante del ratoncito sigiloso
+        setInterval(() => {
+            const mouse = document.getElementById('mouse-escape');
+            if (mouse && !rootUnlocked) {
+                const randomX = Math.floor(Math.random() * 260) - 130;
+                const randomY = Math.floor(Math.random() * 100) - 50;
+                mouse.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            }
+        }, 2200);
+
+        function checkRepetition(actionName) {
+            if (lastAction === actionName) {
+                love = Math.max(0, love - 3);
+                showToast('⚠️ ¡El Cibercat repitió la misma acción y se aburrió! -3 Felicidad');
+                return true;
+            }
+            lastAction = actionName;
+            return false;
+        }
+
+        function updateUI() {
+            document.getElementById('hunger-val').innerText = hunger + '%';
+            document.getElementById('hunger-bar').style.width = hunger + '%';
+            
+            document.getElementById('love-val').innerText = love + '%';
+            document.getElementById('love-bar').style.width = love + '%';
+
+            document.getElementById('energy-val').innerText = energy + '%';
+            document.getElementById('energy-bar').style.width = energy + '%';
+
+            const rootBtn = document.getElementById('btn-root-unlock');
+            if (rootUnlocked) {
+                document.getElementById('hack-val').innerText = 'MIUCEDIDO 🔓';
+                document.getElementById('hack-bar').style.width = '100%';
+                if (rootBtn) {
+                    rootBtn.innerHTML = '<span>⚡</span> Entrar a la Terminal Catnel (Root)';
+                    rootBtn.className = 'w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/40 font-mono-code';
+                }
+            } else {
+                document.getElementById('hack-val').innerText = 'BLOQUEADO 🔒';
+                document.getElementById('hack-bar').style.width = '0%';
+            }
+        }
+function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 5500);
+        }
+
+        function catchRootMouse() {
+            rootUnlocked = true;
+            const mouse = document.getElementById('mouse-escape');
+            if (mouse) {
+                mouse.style.display = 'none';
+            }
+            
+            const rootBtn = document.getElementById('btn-root-unlock');
+            if (rootBtn) {
+                rootBtn.classList.remove('hidden');
+            }
+
+            document.getElementById('cat-avatar').innerText = '🐱‍💻🏆';
+            document.getElementById('cat-thought').innerText = '"...mírame, soy root de la Dark Web, ¡miucedido con éxito en Cibercat Dark Web!"';
+            showToast('🎉 ¡Atrapaste al ratoncito anónimo! ¡Acceso Root de la Dark Web miucedido!');
+            updateUI();
+        }
+
+        function tryAccessRoot() {
+            if (!rootUnlocked) {
+                showToast('🔒 ¡Acceso restringido! Descubre y toca al ratoncito sigiloso 🐁 oculto en la red.');
+                return;
+            }
+            switchToAdminScreen();
+        }
+
+        function tryAccessAdminScreen() {
+            if (!rootUnlocked) {
+                showToast('🔒 ¡Acceso restringido! Atrapa primero al ratoncito sigiloso 🐁 para desbloquear la Dark Web.');
+                return;
+            }
+            switchToAdminScreen();
+        }
+
+        function openCatmidaModal() {
+            const modal = document.getElementById('catmida-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCatmidaModal() {
+            const modal = document.getElementById('catmida-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function devourItem(itemType) {
+            if (checkRepetition('devour_' + itemType)) {
+                updateUI();
+                return;
+            }
+
+            // Registrar acción exacta para la combinación secreta (fish o mouse)
+            recordAction(itemType === 'fish' ? 'fish' : 'mouse');
+
+            hunger = Math.min(100, hunger + 35);
+            love = Math.min(100, love + 2);
+            const display = document.getElementById('eating-display');
+            const text = document.getElementById('eating-text');
+
+            if (itemType === 'fish') {
+                display.innerText = '🐱🍽️🍣';
+                text.innerText = '"¡Ñam ñam, miaulicia! Pescadito clandestino devorado en el nodo Tor."';
+                showToast('🍣 ¡El Cibercat devoró un pescadito oscuro con gusto! (+2 Felicidad)');
+            } else {
+                display.innerText = '🐱🍽️🐭';
+                text.innerText = '"¡Crunch, miaulicia! Ratoncito anónimo procesado en el catnel."';
+                showToast('🐁 ¡El Cibercat devoró un ratoncito de la dark web! (+2 Felicidad)');
+            }
+
+            document.getElementById('cat-avatar').innerText = '🐱‍💻';
+            document.getElementById('cat-thought').innerText = '"¡Banquete clandestino completado en la Dark Web!"';
+            updateUI();
+
+            setTimeout(() => {
+                closeCatmidaModal();
+            }, 4500);
+        }
+
+        function triggerMiualdad(type) {
+            if (checkRepetition('miualdad_' + type)) {
+                updateUI();
+                return;
+            }
+
+            if (type === 'fish') {
+                hunger = Math.min(100, hunger + 30);
+                document.getElementById('cat-avatar').innerText = '🐱‍💻';
+                document.getElementById('cat-thought').innerText = '"¡Sushi Dark Catnel ejecutado con éxito! Ñam ñam miaulicia."';
+                showToast('🍣 ¡El Cibercat disfrutó su Sushi de la Dark Web!');
+            } else {
+                love = Math.min(100, love + 2);
+                document.getElementById('cat-avatar').innerText = '😻';
+                document.getElementById('cat-thought').innerText = '"¡Prrr... Catricia PRO anónima catnectada con éxito!"';
+                showToast('✨ ¡Activaste Catricia PRO de la Dark Web! (+2 Felicidad)');
+            }
+            updateUI();
+        }
+
+        function petCatDirect() {
+            if (checkRepetition('pet_cat')) {
+                updateUI();
+                return;
+            }
+            love = Math.min(100, love + 2);
+            document.getElementById('cat-avatar').innerText = '😻';
+            document.getElementById('cat-thought').innerText = '"Purrrrr... me encantas, más caricias en la red."';
+            updateUI();
+            showToast('🐾 ¡Le diste una caricia al Cibercat! (+2 Felicidad)');
+        }
+
+        function openMiaujuegosModal() {
+            const modal = document.getElementById('miaujuegos-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeMiaujuegosModal() {
+            const modal = document.getElementById('miaujuegos-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function throwBall() {
+            if (checkRepetition('throw_ball')) {
+                updateUI();
+                return;
+            }
+
+            recordAction('ball');
+
+            energy = Math.min(100, energy + 25);
+            love = Math.min(100, love + 2);
+            
+            const catAvatar = document.getElementById('game-cat-avatar');
+            const objDisplay = document.getElementById('game-display-obj');
+            const thought = document.getElementById('game-thought');
+
+            objDisplay.innerText = '🎾💨';
+            catAvatar.innerText = '🐈🏃‍♂️';
+            thought.innerText = '"¡Corre tras la pelotita en Cibercat Web, atrapada con estilo!"';
+            
+            showToast('🎾 ¡Lanzaste la pelotita! El gatito corrió tras ella (+2 Felicidad)');
+            updateUI();
+
+            setTimeout(() => {
+                objDisplay.innerText = '🎾';
+                catAvatar.innerText = '😸';
+                thought.innerText = '"¡Qué divertido fue cazar la pelota de datos!"';
+            }, 4500);
+        }
+
+        function tickleBelly() {
+            if (checkRepetition('tickle_belly')) {
+                updateUI();
+                return;
+            }
+
+            recordAction('belly');
+
+            love = Math.min(100, love + 2);
+            
+            const catAvatar = document.getElementById('game-cat-avatar');
+            const objDisplay = document.getElementById('game-display-obj');
+            const thought = document.getElementById('game-thought');
+
+            objDisplay.innerText = '✨🐾✨';
+            catAvatar.innerText = '😻😺';
+            thought.innerText = '"Purrrrr... ronroneo de pancita feliz, ¡miaulicia total!"';
+            
+            showToast('🐾 ¡Le acariciaste la pancita al gatito! (+2 Felicidad)');
+            updateUI();
+
+            setTimeout(() => {
+                objDisplay.innerText = '🎾';
+                catAvatar.innerText = '😸';
+                thought.innerText = '"Prrr... me encanta la pancita feliz y los miau juegos."';
+            }, 4500);
+        }
+
+        function conquerTerritory() {
+            if (territoriesConquered < totalTerritories) {
+                territoriesConquered++;
+                const name = territoryNames[territoriesConquered - 1];
+                const logs = document.getElementById('terminal-logs');
+                const time = new Date().toLocaleTimeString();
+                
+                logs.innerHTML += `<div class="text-emerald-400">[${time}] ¡Invasión Tor exitosa! Nodo conquistado: ${name}</div>`;
+                logs.scrollTop = logs.scrollHeight;
+
+                document.getElementById('conquest-territory').innerText = `Servidores Ocultos Conquistados: ${territoriesConquered} / ${totalTerritories}`;
+                
+                if (territoriesConquered === totalTerritories) {
+                    document.getElementById('conquest-status').innerText = 'Estado: ¡Toda la Dark Web conquistada por el emperador gatito!';
+                    showToast('🌍👑 ¡Felicidades! Has hackeado y dominado toda la Dark Web felina.');
+                } else {
+                    document.getElementById('conquest-status').innerText = `Estado: Infiltrando nodo ${territoriesConquered}...`;
+                    showToast(`🌍 ¡Nodo "${name}" hackeado con éxito!`);
+                }
+            } else {
+                showToast('👑 ¡La Dark Web ya ha sido totalmente conquistada por el gatito hacker!');
+            }
+        }
+
+ function switchToAdminScreen() {
+            document.getElementById('screen-main').classList.add('hidden');
+            document.getElementById('screen-admin').classList.remove('hidden');
+            
+            // Transformar al avatar en modo Hacker Elite en la consola
+            const logs = document.getElementById('terminal-logs');
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML += `<div class="text-cyan-400">[${time}] 🐱‍💻 GATITO HACKER SUPREMO DE LA DARK WEB ACTIVADO EN ROOT SHELL.</div>`;
+            logs.scrollTop = logs.scrollHeight;
+            
+            updateUI();
+        }
+
+        function switchToMainScreen() {
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('screen-main').classList.remove('hidden');
+        }
+
+        function handleTerminalKey(event) {
+            if (event.key === 'Enter') {
+                executeCommandInput();
+            }
+        }
+
+        function executeCommandInput() {
+            const inputEl = document.getElementById('terminal-input');
+            const cmd = inputEl.value.trim().toLowerCase();
+            const logs = document.getElementById('terminal-logs');
+            const time = new Date().toLocaleTimeString();
+
+            if (!cmd) return;
+
+            logs.innerHTML += `<div class="text-slate-400">[${time}] darkroot@catnet:~# ${cmd}</div>`;
+            inputEl.value = '';
+
+            if (cmd === 'help') {
+                logs.innerHTML += `<div class="text-cyan-400">Comandos dark: help, purr, darkfish, laser, conquer, rm -rf /</div>`;
+            } else if (cmd === 'purr') {
+                love = Math.min(100, love + 2);
+                logs.innerHTML += `<div class="text-emerald-400">Prrrrr... El cibercat ronronea encriptado. (+2 Felicidad)</div>`;
+                showToast('✨ ¡El gatito ronronea en la dark web! (+2 Felicidad)');
+            } else if (cmd === 'darkfish' || cmd === 'treat') {
+                hunger = Math.min(100, hunger + 25);
+                logs.innerHTML += `<div class="text-amber-400">Atún de contrabando entregado por nodo Tor. (+25 Hambre)</div>`;
+                showToast('🐟 ¡Atún de la dark web cargado!');
+            } else if (cmd === 'laser') {
+                logs.innerHTML += `<div class="text-cyan-400">Láser rojo anónimo activado en la red. ¡El gato corre tras él!</div>`;
+                showToast('🔴 ¡Láser de la dark web activado!');
+            } else if (cmd === 'conquer') {
+                conquerTerritory();
+            } else if (cmd === 'rm -rf /' || cmd === 'purge') {
+                logs.innerHTML += `<div class="text-red-400 font-bold">⚠️ ¡AUTODESTRUCCIÓN TOR INICIADA! ¡Llegan los GUAUPOLICÍAS federales 🐶🚨!</div>`;
+                showToast('🚨 ¡Los Guaupolicías federales detectaron la purga de la dark web!');
+                setTimeout(() => {
+                    showGuauPoliceModal();
+                }, 1200);
+            } else {
+                logs.innerHTML += `<div class="text-yellow-400">Comando desconocido en la red oscura. Escribe 'help'.</div>`;
+            }
+
+            updateUI();
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function triggerHack(type) {
+            const logs = document.getElementById('terminal-logs');
+            const time = new Date().toLocaleTimeString();
+            if (type === 'treats') {
+                hunger = 100;
+                logs.innerHTML += `<div class="text-emerald-400">[${time}] Mercado negro hackeado: Atún ilimitado encriptado.</div>`;
+                showToast('🎁 ¡Atún infinito de la dark web desbloqueado!');
+            } else if (type === 'laser') {
+                logs.innerHTML += `<div class="text-cyan-400">[${time}] Control global del láser anónimo obtenido.</div>`;
+                showToast('💻 ¡Control absoluto encriptado obtenido!');
+            } else {
+                logs.innerHTML += `<div class="text-red-400">[${time}] 🚨 ¡Alerta Tor! Ejecutando purga... ¡Llegan los GUAUPOLICÍAS federales 🐶🚨!</div>`;
+                showToast('🐶🚨 ¡Los Guaupolicías interrumpieron la autodestrucción de la dark web!');
+                setTimeout(() => {
+                    showGuauPoliceModal();
+                }, 1200);
+            }
+            updateUI();
+            logs.scrollTop = logs.scrollHeight;
+        }
+    </script>
+</body>
+</html>
